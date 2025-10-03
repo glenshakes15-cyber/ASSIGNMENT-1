@@ -1,2 +1,106 @@
-# ASSIGNMENT-1
- OOP
+#include <iostream>
+#include <vector>
+using namespace std;
+
+class Book {
+public:
+    string title;
+    string author;
+    string isbn;
+    bool isBorrowed;
+
+    Book(string t, string a, string i) : title(t), author(a), isbn(i), isBorrowed(false) {}
+};
+
+class User {
+public:
+    string name;
+    int userId;
+    string borrowedBook;
+
+    User(string n, int id) : name(n), userId(id), borrowedBook("") {}
+};
+
+class Library {
+public:
+    vector<Book*> books;
+    vector<User*> users;
+
+    Library() {}
+
+    void addBook(string title, string author, string isbn){
+        books.push_back(new Book(title, author, isbn));
+        cout<<"Book added: " << title << " by "<< author << " (ISBN: " << isbn << ")" << endl;
+    }
+
+    void addUser(string name, int id){
+        users.push_back (new User(name, id));
+        cout<<"User added: "<< name <<endl;
+    }
+
+    void borrowBook(int userId, string isbn){
+        User* foundUser = nullptr;
+        Book* foundBook = nullptr;
+        for(auto u : users){
+            if(u->userId == userId){
+                foundUser = u;
+                break;
+            }
+        }
+        for(auto b : books){
+            if(b->isbn == isbn){
+                foundBook = b;
+                break;
+            }
+        }
+        if(foundUser && foundBook && !foundBook->isBorrowed){
+            foundBook->isBorrowed = true;
+            foundUser->borrowedBook = isbn;
+            cout<<foundUser->name << " borrowed " << foundBook->title << endl;}
+        else{
+            cout<<"Cannot borrow book."<<endl;
+        }
+    }
+
+    void returnBook(int userId, string isbn){
+        User* foundUser = nullptr;
+        Book* foundBook = nullptr;
+        for(auto u : users){
+            if (u->userId == userId){
+                foundUser = u;
+                break;
+            }
+        }
+        for(auto b : books){
+            if(b->isbn == isbn){
+                foundBook = b;
+                break;
+            }
+        }
+        if(foundUser && foundBook && foundUser->borrowedBook == isbn && foundBook->isBorrowed){
+            foundBook->isBorrowed = false;
+            foundUser->borrowedBook = "";
+            cout<<foundUser->name << " returned " << foundBook->title << endl;}
+        else{
+            cout<<"Cannot return book."<<endl;
+        }
+    }
+};
+int main(){
+    Library lib;
+    lib.addBook("C++ Basics", "Bjarne", "111");
+    lib.addBook("OOP Design", "Grady", "222");
+    lib.addBook("Algorithms", "Sedgewick", "333");
+
+    lib.addUser("Glen", 1);
+    lib.addUser("Britney", 2);  
+    lib.addUser("tashley", 3);
+
+    lib.borrowBook(1, "111");
+    lib.returnBook(1, "111");
+    lib.borrowBook(2, "222");
+    lib.returnBook(2, "222");
+    lib.borrowBook(3, "333");
+    lib.returnBook(3, "333");
+    return 0;
+}
